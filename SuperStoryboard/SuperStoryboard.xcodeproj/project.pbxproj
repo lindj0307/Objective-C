@@ -13,6 +13,7 @@
 		D4679F061C0B52FF0059452B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D4679F041C0B52FF0059452B /* Main.storyboard */; };
 		D4679F081C0B52FF0059452B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D4679F071C0B52FF0059452B /* Assets.xcassets */; };
 		D4679F0B1C0B52FF0059452B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D4679F091C0B52FF0059452B /* LaunchScreen.storyboard */; };
+		D4679F141C0BF3C70059452B /* CustomTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D4679F131C0BF3C70059452B /* CustomTableViewCell.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,8 @@
 		D4679F071C0B52FF0059452B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D4679F0A1C0B52FF0059452B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D4679F0C1C0B52FF0059452B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D4679F121C0BF3C70059452B /* CustomTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomTableViewCell.h; sourceTree = "<group>"; };
+		D4679F131C0BF3C70059452B /* CustomTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomTableViewCell.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,14 +61,11 @@
 		D4679EFA1C0B52FF0059452B /* SuperStoryboard */ = {
 			isa = PBXGroup;
 			children = (
-				D4679EFE1C0B52FF0059452B /* AppDelegate.h */,
-				D4679EFF1C0B52FF0059452B /* AppDelegate.m */,
 				D4679F011C0B52FF0059452B /* ViewController.h */,
 				D4679F021C0B52FF0059452B /* ViewController.m */,
+				D4679F121C0BF3C70059452B /* CustomTableViewCell.h */,
+				D4679F131C0BF3C70059452B /* CustomTableViewCell.m */,
 				D4679F041C0B52FF0059452B /* Main.storyboard */,
-				D4679F071C0B52FF0059452B /* Assets.xcassets */,
-				D4679F091C0B52FF0059452B /* LaunchScreen.storyboard */,
-				D4679F0C1C0B52FF0059452B /* Info.plist */,
 				D4679EFB1C0B52FF0059452B /* Supporting Files */,
 			);
 			path = SuperStoryboard;
@@ -74,6 +74,11 @@
 		D4679EFB1C0B52FF0059452B /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				D4679EFE1C0B52FF0059452B /* AppDelegate.h */,
+				D4679EFF1C0B52FF0059452B /* AppDelegate.m */,
+				D4679F071C0B52FF0059452B /* Assets.xcassets */,
+				D4679F091C0B52FF0059452B /* LaunchScreen.storyboard */,
+				D4679F0C1C0B52FF0059452B /* Info.plist */,
 				D4679EFC1C0B52FF0059452B /* main.m */,
 			);
 			name = "Supporting Files";
@@ -151,6 +156,7 @@
 			files = (
 				D4679F031C0B52FF0059452B /* ViewController.m in Sources */,
 				D4679F001C0B52FF0059452B /* AppDelegate.m in Sources */,
+				D4679F141C0BF3C70059452B /* CustomTableViewCell.m in Sources */,
 				D4679EFD1C0B52FF0059452B /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -264,6 +270,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = SuperStoryboard/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = Anta.Joey.SuperStoryboard;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -275,6 +282,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = SuperStoryboard/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = Anta.Joey.SuperStoryboard;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -300,6 +308,7 @@
 				D4679F111C0B52FF0059452B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
