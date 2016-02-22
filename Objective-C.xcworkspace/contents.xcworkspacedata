@@ -2,6 +2,12 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:PeopleDatabase/PeopleDatabase.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:My First Project/My First Project.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:AutoLayout/AutoLayout.xcodeproj">
    </FileRef>
    <FileRef
