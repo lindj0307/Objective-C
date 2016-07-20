@@ -14,6 +14,8 @@
 		D4473A801C7DAB96000ADDC3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D4473A7E1C7DAB96000ADDC3 /* Main.storyboard */; };
 		D4473A821C7DAB96000ADDC3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D4473A811C7DAB96000ADDC3 /* Assets.xcassets */; };
 		D4473A851C7DAB96000ADDC3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D4473A831C7DAB96000ADDC3 /* LaunchScreen.storyboard */; };
+		D4473A901C7DB131000ADDC3 /* ScaryBugData.m in Sources */ = {isa = PBXBuildFile; fileRef = D4473A8F1C7DB131000ADDC3 /* ScaryBugData.m */; };
+		D4473A931C7DB268000ADDC3 /* ScaryBugDoc.m in Sources */ = {isa = PBXBuildFile; fileRef = D4473A921C7DB268000ADDC3 /* ScaryBugDoc.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +31,10 @@
 		D4473A811C7DAB96000ADDC3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D4473A841C7DAB96000ADDC3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D4473A861C7DAB96000ADDC3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D4473A8E1C7DB131000ADDC3 /* ScaryBugData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScaryBugData.h; sourceTree = "<group>"; };
+		D4473A8F1C7DB131000ADDC3 /* ScaryBugData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScaryBugData.m; sourceTree = "<group>"; };
+		D4473A911C7DB268000ADDC3 /* ScaryBugDoc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScaryBugDoc.h; sourceTree = "<group>"; };
+		D4473A921C7DB268000ADDC3 /* ScaryBugDoc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScaryBugDoc.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,16 +67,9 @@
 		D4473A711C7DAB96000ADDC3 /* ScaryBugs */ = {
 			isa = PBXGroup;
 			children = (
-				D4473A751C7DAB96000ADDC3 /* AppDelegate.h */,
-				D4473A761C7DAB96000ADDC3 /* AppDelegate.m */,
-				D4473A781C7DAB96000ADDC3 /* MasterViewController.h */,
-				D4473A791C7DAB96000ADDC3 /* MasterViewController.m */,
-				D4473A7B1C7DAB96000ADDC3 /* DetailViewController.h */,
-				D4473A7C1C7DAB96000ADDC3 /* DetailViewController.m */,
-				D4473A7E1C7DAB96000ADDC3 /* Main.storyboard */,
+				D4473A8D1C7DB0E6000ADDC3 /* Model */,
+				D4473A8C1C7DB0AB000ADDC3 /* GUI */,
 				D4473A811C7DAB96000ADDC3 /* Assets.xcassets */,
-				D4473A831C7DAB96000ADDC3 /* LaunchScreen.storyboard */,
-				D4473A861C7DAB96000ADDC3 /* Info.plist */,
 				D4473A721C7DAB96000ADDC3 /* Supporting Files */,
 			);
 			path = ScaryBugs;
@@ -79,9 +78,36 @@
 		D4473A721C7DAB96000ADDC3 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				D4473A831C7DAB96000ADDC3 /* LaunchScreen.storyboard */,
+				D4473A861C7DAB96000ADDC3 /* Info.plist */,
 				D4473A731C7DAB96000ADDC3 /* main.m */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		D4473A8C1C7DB0AB000ADDC3 /* GUI */ = {
+			isa = PBXGroup;
+			children = (
+				D4473A751C7DAB96000ADDC3 /* AppDelegate.h */,
+				D4473A761C7DAB96000ADDC3 /* AppDelegate.m */,
+				D4473A781C7DAB96000ADDC3 /* MasterViewController.h */,
+				D4473A791C7DAB96000ADDC3 /* MasterViewController.m */,
+				D4473A7B1C7DAB96000ADDC3 /* DetailViewController.h */,
+				D4473A7C1C7DAB96000ADDC3 /* DetailViewController.m */,
+				D4473A7E1C7DAB96000ADDC3 /* Main.storyboard */,
+			);
+			name = GUI;
+			sourceTree = "<group>";
+		};
+		D4473A8D1C7DB0E6000ADDC3 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				D4473A8E1C7DB131000ADDC3 /* ScaryBugData.h */,
+				D4473A8F1C7DB131000ADDC3 /* ScaryBugData.m */,
+				D4473A911C7DB268000ADDC3 /* ScaryBugDoc.h */,
+				D4473A921C7DB268000ADDC3 /* ScaryBugDoc.m */,
+			);
+			name = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -154,9 +180,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D4473A901C7DB131000ADDC3 /* ScaryBugData.m in Sources */,
 				D4473A771C7DAB96000ADDC3 /* AppDelegate.m in Sources */,
 				D4473A7A1C7DAB96000ADDC3 /* MasterViewController.m in Sources */,
 				D4473A741C7DAB96000ADDC3 /* main.m in Sources */,
+				D4473A931C7DB268000ADDC3 /* ScaryBugDoc.m in Sources */,
 				D4473A7D1C7DAB96000ADDC3 /* DetailViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
