@@ -9,15 +9,199 @@
 #import "RWTableViewController.h"
 #import "UIAlertView+RWBlock.h"
 #import "UIButton+RWBlock.h"
+@import EventKit;
 
 @interface RWTableViewController ()
 
+// The database with calendar events and reminders
+@property (strong, nonatomic)EKEventStore * eventStore;
+
+// Indicates whether app has access to event store.
+@property (nonatomic) BOOL isAccessToEventStoreGranted;
+
 /** @brief An array of NSString objects, data source of the table view. */
 @property (strong, nonatomic) NSMutableArray *todoItems;
+@property (strong, nonatomic) EKCalendar *calendar;
+@property (strong, nonatomic) NSArray *reminders;
 
 @end
 
 @implementation RWTableViewController
+
+#pragma mark - Constants
+
+#pragma mark - Variables
+
+#pragma mark - Properties
+// 1
+-(EKEventStore *)eventStore {
+    if (! _eventStore) {
+        _eventStore = [[EKEventStore alloc] init];
+    }
+    return _eventStore;
+}
+
+-(EKCalendar *)calendar {
+    if (!_calendar) {
+        // 1
+        NSArray *calendars = [self.eventStore calendarsForEntityType:EKEntityTypeReminder];
+        
+        // 2
+        NSString *calendarTitle = @"UDo!";
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"title matches %@",calendarTitle];
+        NSArray *filtered = [calendars filteredArrayUsingPredicate:predicate];
+        
+        if ([filtered count]) {
+            _calendar = [filtered firstObject];
+        } else {
+            // 3
+            _calendar = [EKCalendar calendarForEntityType:EKEntityTypeReminder eventStore:self.eventStore];
+            _calendar.title = @"UDo!";
+            _calendar.source = self.eventStore.defaultCalendarForNewReminders.source;
+            
+            //4
+            NSError *calendarErr = nil;
+            BOOL calendarSuccess = [self.eventStore saveCalendar:_calendar commit:YES error:&calendarErr];
+            if (!calendarSuccess) {
+                //handle error
+            }
+        }
+    }
+    return _calendar;
+}
+
+#pragma mark - Life Cycle
+- (void)viewDidLoad {
+    self.title = @"To Do!";
+    
+    UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressGestureRecognized:)];
+    [self.tableView addGestureRecognizer:longPress];
+    [super viewDidLoad];
+    [self updateAuthorizationStatusToAccessEventStore];
+    
+    [self fetchReminders];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fetchReminders) name:EKEventStoreChangedNotification object:nil];
+}
+
+-(void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+#pragma mark - TableView Delegate
+
+#pragma mark - TableView Data Source
+
+#pragma mark - Custom Delegate
+
+#pragma mark - Event Response
+
+#pragma mark - Private Methods
+
+/**
+ *  @author Joey, 16-07-21 16:07:03
+ *
+ *  delete reminder
+ *
+ *  @param item reminder item
+ */
+-(void)deleteReminderForToDoItem:(NSString *)item {
+    // 1
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"title matches %@", item];
+    NSArray *results = [self.reminders filteredArrayUsingPredicate:predicate];
+    
+    // 2
+    if ([results count]) {
+        [results enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            NSError *error = nil;
+            // 3
+            BOOL success = [self.eventStore removeReminder:obj commit:NO error:&error];
+            if (!success) {
+                // Handle delete error
+            }
+        }];
+        
+        // 4
+        NSError *commitErr = nil;
+        BOOL success =[self.eventStore commit:&commitErr];
+        if (!success) {
+            // Handle commit error
+        }
+    }
+}
+
+-(BOOL)itemHasReminder:(NSString *)item {
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"title matches %@", item];
+    NSArray *filtered = [self.reminders filteredArrayUsingPredicate:predicate];
+    return (self.isAccessToEventStoreGranted && [filtered count]);
+}
+
+-(void)fetchReminders {
+    if (self.isAccessToEventStoreGranted) {
+        // 1
+        NSPredicate *predicate = [self.eventStore predicateForRemindersInCalendars:@[self.calendar]];
+        // 2
+        [self.eventStore fetchRemindersMatchingPredicate:predicate completion:^(NSArray<EKReminder *> * _Nullable reminders) {
+            //3
+            self.reminders = reminders;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                // 4
+                [self.tableView reloadData];
+            });
+        }];
+    }
+}
+
+-(void)updateAuthorizationStatusToAccessEventStore {
+    // 2
+    EKAuthorizationStatus authorizationStatus = [EKEventStore authorizationStatusForEntityType:EKEntityTypeReminder];
+    
+    switch (authorizationStatus) {
+        case EKAuthorizationStatusDenied:
+        case EKAuthorizationStatusRestricted: {
+            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Access Denied" message:@"This app does't have access to your Reminders." delegate:nil cancelButtonTitle:@"Dismiss" otherButtonTitles:nil];
+            [alertView show];
+            [self.tableView reloadData];
+            break;
+        }
+        case EKAuthorizationStatusAuthorized: {
+            self.isAccessToEventStoreGranted = YES;
+            [self.tableView reloadData];
+            break;
+        }
+        case EKAuthorizationStatusNotDetermined: {
+            __weak RWTableViewController *weakSelf = self;
+            [self.eventStore requestAccessToEntityType:EKEntityTypeReminder completion:^(BOOL granted, NSError * _Nullable error) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    weakSelf.isAccessToEventStoreGranted = granted;
+                    [weakSelf.tableView reloadData];
+                });
+            }];
+            break;
+        }
+    }
+}
+
+-(void)addReminderForToDoItem:(NSString *)item {
+    // 1
+    if (!self.isAccessToEventStoreGranted) return;
+    // 2
+    EKReminder *reminder = [EKReminder reminderWithEventStore:self.eventStore];
+    reminder.title = item;
+    reminder.calendar = self.calendar;
+    
+    // 3
+    NSError *error = nil;
+    BOOL success = [self.eventStore saveReminder:reminder commit:YES error:&error];
+    if (!success) {
+        // Handle error
+    }
+    // 4
+    NSString *message = (success)? @"Reminder was successfully added!" : @"Failed to add reminder!";
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:message delegate:nil cancelButtonTitle:nil otherButtonTitles:@"Dismiss", nil];
+    [alertView show];
+}
+
+#pragma mark - Navigation
 
 #pragma mark - Custom accessors
 
@@ -26,17 +210,6 @@
     _todoItems = [@[@"Get Milk!", @"Go to gym", @"Breakfast with Rita!", @"Call Bob", @"Pick up newspaper", @"Send an email to Joe", @"Read this tutorial!", @"Pick up flowers"] mutableCopy];
   }
   return _todoItems;
-}
-
-#pragma mark - View life cycle
-
-- (void)viewDidLoad {
-  self.title = @"To Do!";
-  
-  UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressGestureRecognized:)];
-  [self.tableView addGestureRecognizer:longPress];
-  
-  [super viewDidLoad];
 }
 
 #pragma mark - UITableView data source and delegate methods
@@ -55,16 +228,26 @@
   cell.backgroundColor = [UIColor whiteColor];
   cell.textLabel.text = object;
   
-  // Add a button as accessory view that says 'Add Reminder'.
-  UIButton *addReminderButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-  addReminderButton.frame = CGRectMake(0.0, 0.0, 100.0, 30.0);
-  [addReminderButton setTitle:@"Add Reminder" forState:UIControlStateNormal];
-  
-  [addReminderButton addActionblock:^(UIButton *sender) {
-    // Add the reminder to the store
-  } forControlEvents:UIControlEventTouchUpInside];
-  
-  cell.accessoryView = addReminderButton;
+    if (![self itemHasReminder:object]) {
+        // Add a button as accessory view that says 'Add Reminder'.
+        UIButton *addReminderButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        addReminderButton.frame = CGRectMake(0.0, 0.0, 100.0, 30.0);
+        [addReminderButton setTitle:@"Add Reminder" forState:UIControlStateNormal];
+
+        [addReminderButton addActionblock:^(UIButton *sender) {
+          // Add the reminder to the store
+          [self addReminderForToDoItem:object];
+        } forControlEvents:UIControlEventTouchUpInside];
+
+        cell.accessoryView = addReminderButton;
+    } else {
+        cell.accessoryView = nil;
+        
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"title matches %@",object];
+        NSArray *reminders = [self.reminders filteredArrayUsingPredicate:predicate];
+        EKReminder *reminder = [reminders firstObject];
+        cell.imageView.image = (reminder.isCompleted) ?[UIImage imageNamed:@"checkmarkOn"] : [UIImage imageNamed:@"checkmarkOff"];
+    }
   
   return cell;
 }
@@ -79,14 +262,34 @@
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
   
-  NSString *todoItem = self.todoItems[indexPath.row];
-  
-  // Remove to-do item.
-  [self.todoItems removeObject:todoItem];
-  
-  [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+    NSString *todoItem = self.todoItems[indexPath.row];
+
+    // Remove to-do item.
+    [self.todoItems removeObject:todoItem];
+    [self deleteReminderForToDoItem:todoItem];
+
+    [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
 }
 
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+    
+    NSString *toDoItem = self.todoItems[indexPath.row];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"title matches %@", toDoItem];
+    
+    // Assume there are no duplicates..
+    NSArray *results = [self.reminders filteredArrayUsingPredicate:predicate];
+    EKReminder *reminder = [results firstObject];
+    reminder.completed = !reminder.isCompleted;
+    
+    NSError *error;
+    [self.eventStore saveReminder:reminder commit:YES error:&error];
+    if (error) {
+        // Handle error
+    }
+    
+    cell.imageView.image = (reminder.isCompleted) ?[UIImage imageNamed:@"checkmarkOn"] : [UIImage imageNamed:@"checkmarkOff"];
+}
 #pragma mark - IBActions
 
 - (IBAction)addButtonPressed:(id)sender {
